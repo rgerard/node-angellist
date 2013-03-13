@@ -1,0 +1,28 @@
+{
+  "name": "angellist",
+  "version": "0.1.0",
+  "description": "Node module that wraps the AngelList API",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodeunit test/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/rgerard/node-angellist.git"
+  },
+  "keywords": [
+    "angellist",
+    "api"
+  ],
+  "author": "Ryan Gerard",
+  "engines" : {
+      "node": "*"
+  },
+  "homepage" : "https://github.com/rgerard/node-angellist",
+  "dependencies": {
+    "request" : ">= 0.0.1"
+  },
+  "devDependencies": {
+      "nodeunit": ">= 0.0.1"
+  }
+}
