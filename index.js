@@ -46,6 +46,16 @@ function getMe(callback) {
     }
 }
 
+function search(query, callback) {
+    var url = 'https://api.angel.co/1/search?query=' + query;
+    createRequest(url, callback);
+}
+
+function getUser(angelID, callback) {
+    var url = 'https://api.angel.co/1/users/' + angelID;
+    createRequest(url, callback);
+}
+
 function createRequest(url, callback) {
     request(url, function (error, response, body) {
 
@@ -91,5 +101,13 @@ module.exports = {
 
     getMe: function(callback) {
         return getMe(callback);
+    },
+
+    search: function(query, callback) {
+        return search(query, callback);
+    },
+
+    getUser: function(angelID, callback) {
+        return getUser(angelID, callback);
     }
 }
