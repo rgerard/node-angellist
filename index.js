@@ -1,4 +1,4 @@
-// Copyright 2010-2012 Ryan Gerard
+// Copyright 2010-2013 Ryan Gerard
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -26,12 +26,11 @@ function setAccessToken(token) {
 }
 
 function getAuthUrl() {
-    var url = 'https://angel.co/api/oauth/authorize?client_id=' + config.clientID + '&scope=email&response_type=code';
-    return url;
+    return urlHelper.createAuthUrl();
 }
 
 function requestAccessToken(code, callback) {
-    var url = 'https://angel.co/api/oauth/token?client_id=' + config.clientID + '&client_secret=' + config.secret + '&code=' + code + '&grant_type=authorization_code';
+    var url = urlHelper.createAccessTokenRequestUrl(code);
     createPostRequest(url, '', callback);
 }
 
@@ -41,18 +40,28 @@ function getMe(callback) {
     if(!config.hasOwnProperty('access_token') || config.access_token === null || config.access_token === '') {
         callback({'error':'no access token'}, null);
     } else {
-        var url = 'https://api.angel.co/1/me?access_token=' + config.access_token;
+        var url = urlHelper.createMeUrl();
         createRequest(url, callback);
     }
 }
 
 function search(query, callback) {
-    var url = 'https://api.angel.co/1/search?query=' + query;
+    var url = urlHelper.createSearchUrl(query);
     createRequest(url, callback);
 }
 
-function getUser(angelID, callback) {
-    var url = 'https://api.angel.co/1/users/' + angelID;
+function searchBySlug(query, callback) {
+    var url = urlHelper.createSearchSlugUrl(query);
+    createRequest(url, callback);
+}
+
+function getUserById(angelID, callback) {
+    var url = urlHelper.createUserUrl(angelID);
+    createRequest(url, callback);
+}
+
+function getUsersById(angelIDs, callback) {
+    var url = urlHelper.createUsersBatchUrl(angelIDs);
     createRequest(url, callback);
 }
 
@@ -107,7 +116,15 @@ module.exports = {
         return search(query, callback);
     },
 
-    getUser: function(angelID, callback) {
-        return getUser(angelID, callback);
+    searchBySlug: function(query, callback) {
+        return searchBySlug(query, callback);
+    },
+
+    getUserById: function(angelID, callback) {
+        return getUserById(angelID, callback);
+    },
+
+    getUsersById: function(angelIDs, callback) {
+        return getUsersById(angelIDs, callback);
     }
 }

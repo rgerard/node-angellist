@@ -1,61 +1,84 @@
-var config = require('../config');
+var config = require('../config'),
+    _ = require('underscore');
 
-function getEntityUrl(entityType, name) {
+function createAuthUrl() {
 
-    // URL should look like: http://api.crunchbase.com/v/1/Entity/Name.js
-    return 'http://api.crunchbase.com/v/1/'
-        + encodeURIComponent(entityType)
-        + '/'
-        + encodeURIComponent(name)
-        + '.js?api_key='
-        + config.apikey;
+    // URL should look like: https://angel.co/api/oauth/authorize?client_id=CLIENTID&scope=email&response_type=code
+    return 'https://angel.co/api/oauth/authorize?client_id='
+        + config.clientID
+        + '&scope=email&response_type=code';
 }
 
-function getEntityListUrl(entityType) {
+function createAccessTokenRequestUrl(code) {
 
-    // URL should look like: http://api.crunchbase.com/v/1/Entity-Type.js
-    return 'http://api.crunchbase.com/v/1/'
-        + entityType
-        + '.js?api_key='
-        + config.apikey;
+    // URL should look like: 'https://angel.co/api/oauth/token?client_id=CLIENTID&client_secret=SECRET&code=CODE&grant_type=authorization_code';
+    return 'https://angel.co/api/oauth/token?client_id='
+        + config.clientID
+        + '&client_secret='
+        + config.secret + '&code='
+        + code
+        + '&grant_type=authorization_code';
 }
 
-function searchUrl(query) {
+function createMeUrl() {
 
-    // URL should look like: http://api.crunchbase.com/v/1/search.js
-    return 'http://api.crunchbase.com/v/1/search.js?query='
-        + encodeURIComponent(query)
-        + '&api_key='
-        + config.apikey;
+    // URL should look like: 'https://api.angel.co/1/me?access_token=TOKEN;
+    return 'https://api.angel.co/1/me?access_token='
+        + config.access_token;
 }
 
-function getPostsUrl(entityType, name, firstName, lastName) {
+function createSearchUrl(query) {
 
-    // URL should look like: http://api.crunchbase.com/v/1/companies/posts?name=NAME&first_name=FIRST_NAME&last_name=LAST_NAME&api_key=XXXX
-    return 'http://api.crunchbase.com/v/1/'
-        + entityType
-        + '/posts?name='
-        + encodeURIComponent(name)
-        + '&first_name='
-        + encodeURIComponent(firstName)
-        + '&last_name='
-        + encodeURIComponent(lastName)
-        + '&api_key='
-        + config.apikey;
+    // URL should look like: 'https://api.angel.co/1/search?query=QUERY'
+    return 'https://api.angel.co/1/search?query='
+        + encodeURIComponent(query);
+}
+
+function createSearchSlugUrl(query) {
+
+    // URL should look like: 'https://api.angel.co/1/search/slugs?query=QUERY'
+    return 'https://api.angel.co/1/search/slugs?query'
+        + encodeURIComponent(query);
+}
+
+function createUserUrl(userID) {
+
+    // URL should look like: 'https://api.angel.co/1/users/ANGELLISTID';
+    return 'https://api.angel.co/1/users/'
+        + userID;
+}
+
+function createUsersBatchUrl(userIDs) {
+
+    // Map array of IDs to a comma-separated string
+    var idList = _.reduce(userIDs, function(initial, userID){ return initial + userID + ','; }, '');
+
+    // URL should look like: 'https://api.angel.co/1/users/batch?ids=ID1,ID2';
+    return 'https://api.angel.co/1/users/batch?ids='
+        + idList;
 }
 
 module.exports = {
 
-    getEntityUrl: function(entityType, name) {
-        return getEntityUrl(entityType, name);
+    createAuthUrl: function() {
+        return createAuthUrl();
     },
-    getEntityListUrl: function(entityType) {
-        return getEntityListUrl(entityType);
+    createAccessTokenRequestUrl: function(code) {
+        return createAccessTokenRequestUrl(code);
     },
-    searchUrl: function(query) {
-        return searchUrl(query);
+    createMeUrl: function() {
+        return createMeUrl();
     },
-    getPostsUrl: function(entityType, name, firstName, lastName) {
-        return getPostsUrl(entityType, name, firstName, lastName);
+    createSearchUrl: function(query) {
+        return createSearchUrl(query);
+    },
+    createSearchSlugUrl: function(query) {
+        return createSearchSlugUrl(query);
+    },
+    createUserUrl: function(userID) {
+        return createUserUrl(userID);
+    },
+    createUsersBatchUrl: function(userIDs) {
+        return createUsersBatchUrl(userIDs);
     }
 }

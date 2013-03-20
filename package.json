@@ -20,9 +20,7 @@
   },
   "homepage" : "https://github.com/rgerard/node-angellist",
   "dependencies": {
-    "request" : ">= 0.0.1"
-  },
-  "devDependencies": {
-      "nodeunit": ">= 0.0.1"
+    "request" : "*",
+    "underscore": "*"
   }
 }
