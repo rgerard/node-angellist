@@ -1,6 +1,6 @@
 # node-angellist: Easy wrapper around the AngelList API
 
-This module is designed to be an easy-to-use wrapper around the AngelList API.  This module is designed to be used with node.js, but could be modified to be used directly in the browser as well.
+This module is designed to be an easy-to-use wrapper around the AngelList API.  This module is designed to be used with node.js.
 
 ## Install
 
@@ -23,7 +23,7 @@ Or from source:
 var angel = require('angellist');
 
 // Init the object with your API key
-angel.init(apikey);
+angel.init(clientID, clientSecret);
 
 // Search for a company name
 angel.search('pickmoto', function(error, results) {
@@ -34,91 +34,119 @@ angel.search('pickmoto', function(error, results) {
 ```
 
 
-## Test
-
-I have written unit tests for these API calls using the <a href="https://github.com/caolan/nodeunit">nodeunit</a> framework.
-The unit tests make actual API calls, so be wary of your API call limit.
-
-To run the unit tests:
-
-```
-nodeunit test/
-```
-
-
 ## Documentation
 
-Please refer to the <a href="http://developer.crunchbase.com/io-docs">CrunchBase API documentation</a> for more detail on their API.
+Please refer to the <a href="https://angel.co/api">AngelList API documentation</a> for more detail on their API.
 
 * [init](#init)
-* [getEntity](#getEntity)
-* [getEntityList](#getEntityList)
+* [getAuthUrl](#getAuthUrl)
+* [requestAccessToken](#requestAccessToken)
+* [setAccessToken](#setAccessToken)
+* [getMe](#getMe)
 * [search](#search)
-* [getPosts](#getPosts)
+* [getUserById](#getUserById)
 
 
-## CrunchBase API
+## AngelList API
 
 <a name="init" />
-### init(apikey)
+### init(clientID, clientSecret)
 
-Inits the object with your API data, including your API key.
+Inits the object with your client data;
 
 __Arguments__
 
-* apikey - Your API key
+* clientID - Your client ID
+* clientSecret - Your client secret
 
 __Example__
 
 ```js
-// Fetch the schedule for Week 1 of the NFL season
-var crunchbase = require('crunchbase');
-crunchbase.init(apikey);
+// Init an AngelList object
+var angel = require('angellist');
+angel.init(clientID, clientSecret);
 ```
 
 ---------------------------------------
 
-<a name="getEntity" />
-### getEntity(entityType, name, callback)
+<a name="getAuthUrl" />
+### getAuthUrl()
 
-Returns information about the entity as a JSON object
+Returns the URL needed to start the authentication process.
+
+__Example__
+
+```js
+// Redirect the user to the auth URL
+var url = angel.getAuthUrl();
+res.redirect(url);
+```
+
+---------------------------------------
+
+<a name="requestAccessToken" />
+### requestAccessToken(code, callback)
+
+Requests an access token for a user who has authenticated your application
 
 __Arguments__
 
-* entityType - Can be either company, person, financial-organization, product, or service-provider
-* name - The entity name to search for
+* code - Returned from AngelList after the user has authenticated your app
 * callback(err, body) - A callback which is called after the API call has returned, or an error has occurred.
 
 __Example__
 
 ```js
-// Fetch information about Dropbox
-crunchbase.getEntity('company', 'dropbox', function(error, entityInfo) {
+// Fetch the access token
+angel.requestAccessToken(req.query['code'], function(err, body) {
  if (!error) {
-    console.log(entityInfo);
+    // Set the access token
+    angel.setAccessToken(body.access_token);
   }
 });
 ```
 
 ---------------------------------------
 
-<a name="getEntityList" />
-### getEntityList(entityType, callback)
+<a name="setAccessToken" />
+### setAccessToken(token)
 
-Returns every entity of a certain type in the system as a JSON object
+Stores the access token returned from AngelList
 
 __Arguments__
 
-* entityType - Can be either companies, people, financial-organizations, products, or service-providers
+* token - Token to save
+
+__Example__
+
+```js
+// Fetch the access token
+angel.requestAccessToken(req.query['code'], function(err, body) {
+ if (!error) {
+    // Set the access token
+    angel.setAccessToken(body.access_token);
+  }
+});
+```
+
+---------------------------------------
+
+<a name="getMe" />
+### getMe(callback)
+
+Returns the information about the logged-in user
+
+__Arguments__
+
 * callback(err, body) - A callback which is called after the API call has returned, or an error has occurred.
 
 __Example__
 
 ```js
-// Fetch every company in the system
-crunchbase.getEntityList('company', function(error, allCompanies) {
+// Fetch the posts for a company/person
+angel.getMe(function(err, user) {
  if (!error) {
-    console.log(allCompanies);
+    console.log(user);
   }
 });
 ```
@@ -128,46 +156,43 @@ crunchbase.getEntityList('company', function(error, allCompanies) {
 <a name="search" />
 ### search(query, callback)
 
-Returns search results as a JSON object
+Returns the search results from a query.
 
 __Arguments__
 
-* query - Parameter to search on
+* query - The person or company to search for
 * callback(err, body) - A callback which is called after the API call has returned, or an error has occurred.
 
 __Example__
 
 ```js
-// Search for the company Xobni
-crunchbase.search('xobni', function(error, xobniData) {
+// Search for a person or company
+angel.search('pickmoto', function(err, results) {
  if (!error) {
-    console.log(xobniData);
+    console.log(results);
   }
 });
 ```
 
 ---------------------------------------
 
-<a name="getPosts" />
-### getPosts(entityType, name, firstName, lastName, callback)
+<a name="getUserById" />
+### getUserById(angelID, callback)
 
-Returns the posts of a person in an entity as a JSON object
+Returns the information about a user by their AngelList ID.
 
 __Arguments__
 
-* entityType - Can be either companies, people, financial-organizations, products
-* name - The entity name
-* firstName - The person's first name
-* lastName - The person's last name
+* angelID - The AngelList ID of the person to get information for.
 * callback(err, body) - A callback which is called after the API call has returned, or an error has occurred.
 
 __Example__
 
 ```js
-// Fetch the posts for a company/person
-crunchbase.getPosts('companies', 'dropbox', 'drew', 'houston', function(error, postsData) {
+// Search for a person or company
+angel.getUserById(77, function(err, user) {
  if (!error) {
-    console.log(postsData);
+    console.log(user);
   }
 });
 ```
